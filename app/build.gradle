@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'jacoco'
 }
 
 android {
@@ -19,6 +20,7 @@ android {
 
     buildTypes {
         debug {
+            testCoverageEnabled true
             buildConfigField "String", "BASE_URL", "\"http://api.currencylayer.com/\""
             buildConfigField "String", "API_KEY", "\"bacce2c96464f7f0fe1475b46bafc323\""
         }
@@ -39,6 +41,17 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+    testOptions.unitTests {
+        all {
+            jacoco {
+                useJUnitPlatform {
+                    includeEngines 'junit-vintage', 'junit-jupiter'
+                }
+            }
+            failFast = false
+            jvmArgs "-Xmx2g"
+        }
     }
 }
 
@@ -84,7 +97,7 @@ dependencies {
     implementation "com.google.code.gson:gson:$gson_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_gson_version"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation"com.squareup.okhttp3:logging-interceptor:4.9.1"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.1"
 
     //Room
     implementation "androidx.room:room-runtime:$room_version"
@@ -98,4 +111,31 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
     testImplementation "org.mockito:mockito-core:$mockito_kotlin_version"
+}
+
+jacoco {
+    toolVersion = "0.8.6"
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+    reports {
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class',
+                      '**/R$*.class',
+                      '**/BuildConfig.*',
+                      '**/Manifest*.*',
+                      '**/*Test*.*',
+                      'android/**/*.*',
+                      '**/data/models/*']
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.builtBy(fileTree(dir: "$buildDir", includes: [
+        "jacoco/testDebugUnitTest.exec",
+        "outputs/code-coverage/connected/*coverage.ec"
+    ]))
 }
