@@ -48,7 +48,6 @@ class CurrencyListFragment : Fragment() {
                             viewBinder.txvCurrent,
                             viewBinder.txvAstUpdated,
                             viewBinder.btnExchange,
-                            viewBinder.btnRefresh,
                             viewBinder.currencyList,
                             viewBinder.errorLayout.root
                         )
@@ -61,7 +60,6 @@ class CurrencyListFragment : Fragment() {
                             viewBinder.txvCurrent,
                             viewBinder.txvAstUpdated,
                             viewBinder.btnExchange,
-                            viewBinder.btnRefresh,
                             viewBinder.currencyList
                         )
                     )
