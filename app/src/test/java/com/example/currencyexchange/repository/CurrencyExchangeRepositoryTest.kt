@@ -97,4 +97,11 @@ class CurrencyExchangeRepositoryTest {
         assertTrue(uiStateReverse is ExchangeRate)
         assertEquals((uiStateReverse as ExchangeRate).rate , 0.13513513513513514)
     }
+
+    @Test
+    fun `format currency when fetch null`() = runBlocking {
+        Mockito.`when`(currencyRateDao.getExchangeRateBasedOnCountry("USD")).thenReturn(null)
+        val uiState = repo.formatCurrency("USD", "INR", 10.0)
+        assertTrue(uiState is FailedUiState)
+    }
 }
